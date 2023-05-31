@@ -30,15 +30,19 @@ exports.updateUser = (request, response) => {
     const { id } = request.params;
     const { username, email, password } = request.body;
     const saltRounds = 10;
-
-    
-    userModel.findByIdAndUpdate(id, { username, email, password }, { new: true })
-        .then(updatedUser => {
-            if (!updaitbashtedUser) throw new Error(`User with id ${userId} not found`);
-            response.status(200).json(updatedUser);
-        })
-        .catch(err => response.status(500).json({ message: 'An error has ocurred', err }));
-};
+    bcrypt.hash(password, saltRounds, function (err, hash) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        } else {
+            userModel.findByIdAndUpdate(id, { username, email, password }, { new: true })
+                .then(updatedUser => {
+                    if (!updaitbashtedUser) throw new Error(`User with id ${id} not found`);
+                    response.status(200).json(updatedUser);
+                })
+                .catch(err => response.status(500).json({ message: 'An error has ocurred', err }));
+        }
+    });
+}
 
 exports.deleteUser = (request, response) => {
     const { id } = request.params;
